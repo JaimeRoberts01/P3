@@ -99,7 +99,7 @@ public class FitnessProgram {
 	
 	
 	
-	
+	//I hate Java
 	
 	
 	
