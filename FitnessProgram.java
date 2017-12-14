@@ -1,4 +1,5 @@
-//import java.util.*;
+import java.util.*;
+
 
 /**
  * Maintains a list of Fitness Class objects
@@ -6,133 +7,178 @@
  * The methods allow objects to be added and deleted from the list
  * In addition an array can be returned in order of average attendance
  */
+
+
 public class FitnessProgram {
 
 	private final int MAXCLASSES = 7;
-	private FitnessClass[] fClass;
-	private int numClasses;
+	private FitnessClass[] fClass, sortedClasses;
+	private final int FIVEWEEKS = 5; 
 	
-	
+
 	public FitnessProgram () { //Creating the array.
 
-		fClass = new FitnessClass [MAXCLASSES];	
-		
+		fClass = new FitnessClass [MAXCLASSES];		
 	}
 
-	
+
 	public FitnessClass [] getfClass () {
-		return fClass;
-		
+		return fClass;	
 	}
-		
+
+
 	public String buildClassList (int startTime) {
 
 		String className = " ";
-		
-		try {
 
-			for (int i=0; i<MAXCLASSES; i++) {
+		for (int i=0; i<MAXCLASSES; i++) {
 
-				FitnessClass fc = this.getfClass()[i];
+			if (fClass[i] == null) {
+				className = "Available";	
+			}
 
-				if (fc == null) {
-					className = "Available";	
-				}
-
-				else if (startTime + 9  == (Integer.parseInt(fc.getStartTime()))) {
-					className = fc.getClassName();	
-					return className;	
-				}
-			}	
-		}
-		catch (NullPointerException NPE)  {
-			NPE.printStackTrace();
-		}
-
+			else if (startTime + 9  == (fClass[i].getStartTime())) {
+				className = fClass[i].getClassName();	
+				return className;
+			}
+		}	
+	
 		return className;
 	}
-	
-	
+
+
 	public String buildTutorList (int startTime) {
 
 		String tutorName = " ";
-		
-		try {
 
-			for (int i=0; i<MAXCLASSES; i++) {
+		for (int i=0; i<MAXCLASSES; i++) {
 
-				FitnessClass fc = this.getfClass()[i];
+			if (fClass [i] == null) {
+				i++;
+			}
 
-				if (fc == null) {
-					tutorName = " ";		
-				}
-
-				else if (startTime + 9  == (Integer.parseInt(fc.getStartTime()))) {
-					tutorName = fc.getTutorName();	
-					return tutorName;	
-				}
-			}	
-		}
-		catch (NullPointerException NPE)  {
-			NPE.printStackTrace();
-		}
-
+			else if (startTime + 9  == (fClass[i].getStartTime())) {
+				tutorName = fClass[i].getTutorName();	
+				return tutorName;
+			}
+		}	
+	
 		return tutorName;
 	}
-	
-	//////////////////////////////////////////////////////////
-	
-	public String populateAttendances (String line) {
+
+
+	public FitnessClass populateAttendances (String attClassID) {
+
 		
 		
 		for (int i=0; i<MAXCLASSES; i++) {
-		//FitnessClass fc = this.getfClass() [i];
-		
-		
-		
-		
+
+			if (fClass [i] == null) {
+				i++;
+			}
+
+			else  {
+				String getID = fClass[i].getClassID();
+
+				if (getID.equals(attClassID)) {
+
+					System.out.println(getID + " " + attClassID);
+
+					return fClass[i];
+				}
+			}
+
 		}
-		return " ";
-	}
-	
-	
-	
-	
-	
-	//I hate Java
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	public int getNumClasses() {
-		return numClasses;
+
+		return null;
 	}
 
-	public void setNumClasses(int numClasses) {
-		this.numClasses = numClasses;
+
+	public String sortedAttendance () {
+
+		String sortedAttendance = " ";
+		sortedClasses = new FitnessClass [FIVEWEEKS];
+		int j = 0;
+
+		for (int i = 0; i < MAXCLASSES; i++) {
+			if (fClass[i] != null) {
+				sortedClasses[j++] = fClass [i];
+			}
+		}
+
+		//Arrays.sort(descendingClasses, Collections.reverseOrder());
+
+		Arrays.sort(sortedClasses);
+		sortedAttendance = (Arrays.toString(sortedClasses) + "\n");
+
+
+		String sortedAttendance1 = sortedAttendance.replace(",","");
+		String sortedAttendance2 = sortedAttendance1.replace("[","");
+		String sortedAttendanceFinal = sortedAttendance2.replaceAll("]", "");
+
+		System.out.println("sortedClasses " + sortedAttendanceFinal);
+		//System.out.println ("sortedClasses1" + Arrays.toString(sortedClasses));
+
+		//return sortedAttendance;
+		return sortedAttendanceFinal;
 	}
+
 	
-	public void checkArray () {
-		
-		for (int i =0; i< MAXCLASSES; i++) {
-			if (fClass[i] == null) {
-				System.err.println ("null");
+	public String overallAttendanceAverage () {
+
+
+		double individualAverage = 0.00;
+		double sumAverages = 0.00;
+		double overallAverage = 0.00;
+
+		String overallAverageAttendance = " ";
+
+		for (FitnessClass fC: sortedClasses) {
+
+			individualAverage = fC.averageAttendance();
+			sumAverages += individualAverage;
+
+			overallAverage = (double) sumAverages/sortedClasses.length;
 		}
-		else {
-			System.err.println(fClass[i].getStartTime());
-			//System.err.println(fClass [i]);
-		}
-			//System.err.println(fClass.getClass());
-			//
-		}
-		
-	}
+
+		overallAverageAttendance = String.format("%9.2f", overallAverage);	
+		System.out.println ("Overall Average = " + overallAverageAttendance);
+
+		return overallAverageAttendance;
+	}	
+
+
+
+
+
+
+
+
+
+
+	//	public int getNumClasses() {
+	//		return numClasses;
+	//	}
+	//
+	//	public void setNumClasses(int numClasses) {
+	//		this.numClasses = numClasses;
+	//	}
+	//
+	//	public void checkArray () {
+	//
+	//		for (int i =0; i< MAXCLASSES; i++) {
+	//			if (fClass[i] == null) {
+	//				System.err.println ("null");
+	//			}
+	//			else {
+	//				System.err.println(fClass[i].getStartTime());
+	//				//System.err.println(fClass [i]);
+	//			}
+	//			//System.err.println(fClass.getClass());
+	//			//
+	//		}
+	//
+	//	}
 }
 
 

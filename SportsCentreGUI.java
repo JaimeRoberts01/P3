@@ -10,9 +10,14 @@ import java.io.*;
  * Defines a GUI that displays details of a FitnessProgram object
  * and contains buttons enabling access to the required functionality.
  */
-@SuppressWarnings("serial") // Why does it do this? It's annoying.
+
+
+@SuppressWarnings("serial")
+
 public class SportsCentreGUI extends JFrame implements ActionListener {
 
+	/* Instance variables.*/
+	
 	/** GUI JButtons */
 	private JButton closeButton, attendanceButton;
 	private JButton addButton, deleteButton;
@@ -32,27 +37,32 @@ public class SportsCentreGUI extends JFrame implements ActionListener {
 	private final String attendancesFile = "AttendancesIn.txt";
 
 	private FitnessClass fitClass;
+	//private FitnessClass fC;
 	private FitnessProgram fitProg;
+	
+	
 	/**
 	 * Constructor for AssEx3GUI class
 	 */
+	
 	public SportsCentreGUI() {
 
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setTitle("Boyd-Orr Sports Centre");
 		setSize(700, 300);
-		setResizable (false); // cannot change the size.
+		setResizable (false); // Cannot change the size.
 		display = new JTextArea();
 		display.setFont(new Font("Courier", Font.PLAIN, 14));
-		display.setEditable(false); // cannot write in the display area.
+		display.setEditable(false); // Cannot write in the display area.
 		add(display, BorderLayout.CENTER);
 		layoutTop();
 		layoutBottom();
+
+		/* Calls the initLadiesDay, updateDisplay and initAttendance methods.*/
 		
-		initLadiesDay();
-		updateDisplay ();
+		initLadiesDay();  
+		updateDisplay (); // Calls the updateDisplay 
 		initAttendances();
-		fitProg.checkArray();
 	}
 
 
@@ -61,7 +71,7 @@ public class SportsCentreGUI extends JFrame implements ActionListener {
 	 * using data from the file ClassesIn.txt
 	 */
 	
-	public void initLadiesDay() {
+	public void initLadiesDay() { 
 
 		fitProg = new FitnessProgram ();
 
@@ -75,17 +85,23 @@ public class SportsCentreGUI extends JFrame implements ActionListener {
 				String classes = scanner.nextLine();
 				System.out.println("The initLadies day method " + classes);
 				fitClass = new FitnessClass (classes);
-				fitProg.getfClass()[Integer.parseInt(fitClass.getStartTime())-9] = fitClass;  
-//				fitClass = new FitnessClass (line);
-//				fitProg.getfClass(fitClass);
+				fitProg.getfClass()[fitClass.getStartTime()-9] = fitClass; // Organised by start time.
+//				fC = new FitnessClass(classes);
+//				fitProg.getfClass () [fC.getStartTime()-9] = fC;
 			}
-			//updateDisplay (fitProg)
+			
 			reader.close();
 			scanner.close();
 		}
 
-		catch(IOException IOE) {
+		catch (IOException IOE) { 
+			JOptionPane.showMessageDialog(null, "FILE NOT FOUND", "ERROR", JOptionPane.ERROR_MESSAGE);
 			IOE.printStackTrace();		
+		}
+		
+		catch (InputMismatchException IME) {
+			JOptionPane.showMessageDialog(null, "INVALID FILE", "ERROR", JOptionPane.ERROR_MESSAGE);
+			IME.printStackTrace();	
 		}
 	}
 
@@ -101,27 +117,47 @@ public class SportsCentreGUI extends JFrame implements ActionListener {
 		Scanner scanner = null;
 
 		try {
+			
 			reader = new FileReader(attendancesFile); // deal with this problem once you've sorted the classes problem.
 			scanner = new Scanner(reader);
 			while (scanner.hasNextLine()) { 
+
 				String attendances = scanner.nextLine();
 				System.out.println("The initAttendances method " + attendances);
-				//display.append(line + "\n");
 
-				// search array of fitnessclasses for LB1, then call populatewAttendances with the object whose id is LB1
-				//step 1 for every item in fitnessclass array
-				// step 2 if item's id is equal to LB1
-				// step 3 call populate attendances with the object whose id is equal to LB1. item.populateAttendances(line);
+				String [] attendanceDetails = attendances.split(" ");
+				String attclassID = attendanceDetails [0];
+
+				int week1 = Integer.parseInt (attendanceDetails [1]);
+				int week2 = Integer.parseInt (attendanceDetails [2]);
+				int week3 = Integer.parseInt (attendanceDetails [3]);
+				int week4 = Integer.parseInt (attendanceDetails [4]);
+				int week5 = Integer.parseInt (attendanceDetails [5]);
+				int [] allWeeks = {week1, week2, week3, week4, week5};
+
+
+				//fitProg.populateAttendances (attclassID); // not sure about this one.
+				//fC = fitProg.populateAttendances (attclassID); // delete
+				fitClass = fitProg.populateAttendances(attclassID);
+				//fitProg.populateAttendances (attendanceDetails);
+				//fC.setAttendanceRecords(allWeeks);
+				fitClass.setAttendanceRecords(allWeeks);
 			}
 
 			reader.close();
 			scanner.close();
 		}
 
-		catch(IOException e) {
-			e.printStackTrace();		
+		catch (IOException IOE) { 
+			JOptionPane.showMessageDialog(null, "FILE NOT FOUND", "ERROR", JOptionPane.ERROR_MESSAGE);
+			IOE.printStackTrace();		
 		}
-	}
+		
+		catch (InputMismatchException IME) {
+			JOptionPane.showMessageDialog(null, "INVALID FILE", "ERROR", JOptionPane.ERROR_MESSAGE);
+			IME.printStackTrace();	
+		}
+	}	
 
 
 	/**
@@ -130,31 +166,33 @@ public class SportsCentreGUI extends JFrame implements ActionListener {
 
 	public void updateDisplay() {
 
-		display.setBorder (new EmptyBorder (8,8,8,8));
-		
+		display.setBorder (new EmptyBorder (8,8,8,8)); // Creates a border around the edge of the display.
+
 		String [] header = {"9-10", "10-11", "11-12", "12-13", "13-14", "14-15", "15-16"};
+		
 		for (int i = 0; i<7; i++) {
-		display.append(String.format("%-13s", header[i]));
-		}
 			
-		display.append("\n");
-		
-		for (int i = 0; i<7; i++) {
-		display.append (String.format("%-13s", fitProg.buildClassList(i)));
+			display.append(String.format("%-13s", header[i]));
 		}
-		
+
 		display.append("\n");
-		
+
 		for (int i = 0; i<7; i++) {
-		display.append (String.format("%-13s", fitProg.buildTutorList(i)));
+			display.append (String.format("%-13s", fitProg.buildClassList(i)));
+		}
+
+		display.append("\n");
+
+		for (int i = 0; i<7; i++) {
+			display.append (String.format("%-13s", fitProg.buildTutorList(i)));
 		}	
 	}
 
-	
+
 	/**
 	 * adds buttons to top of GUI
 	 */
-	
+
 	public void layoutTop() {
 		JPanel top = new JPanel();
 		closeButton = new JButton("Save and Exit");
@@ -166,12 +204,13 @@ public class SportsCentreGUI extends JFrame implements ActionListener {
 		add(top, BorderLayout.NORTH);
 	}
 
-	
+
 	/**
 	 * adds labels, text fields and buttons to bottom of GUI
 	 */
 	
 	public void layoutBottom() {
+		
 		// instantiate panel for bottom of display
 		JPanel bottom = new JPanel(new GridLayout(3, 3));
 
@@ -206,34 +245,38 @@ public class SportsCentreGUI extends JFrame implements ActionListener {
 		add(bottom, BorderLayout.SOUTH);
 	}
 
-	
+
 	/**
 	 * Processes adding a class
 	 */
-	
+
 	public void processAdding() {
+		
 		System.err.println("processAdding method");
 		// your code here
 	}
 
-	
+
 	/**
 	 * Processes deleting a class
 	 */
 	
 	public void processDeletion() {
+		
 		System.err.println("processDeletion method");
 		// your code here
 	}
 
+	
 	/**
 	 * Instantiates a new window and displays the attendance report
 	 */
-	
+
 	public void displayReport() {
 
 		System.err.println("displayReport method");
-		report = new ReportFrame ();
+		report = new ReportFrame (fitProg);
+		report.reportFormatter ();
 	}
 
 	
@@ -243,10 +286,11 @@ public class SportsCentreGUI extends JFrame implements ActionListener {
 	 */
 	
 	public void processSaveAndClose() {
-		
+
 		FileWriter fWriter = null;
 
 		try{
+			
 			try {
 				fWriter = new FileWriter (classesOutFile);
 				fWriter.write("This file writer is working");// this bit needs to be in a loop, i think.
@@ -255,12 +299,15 @@ public class SportsCentreGUI extends JFrame implements ActionListener {
 
 			finally {
 				if (fWriter != null) fWriter.close (); // Closes the writer.
+				
 			}
 		}
 
 		catch (IOException IOE) {
-			JOptionPane.showMessageDialog (null, "THERE WAS A PROBLEM WITH YOUR FILE", "WARNING", JOptionPane.ERROR_MESSAGE);
-		}					
+			JOptionPane.showMessageDialog (null, "FILE NOT FOUND", "ERROR", JOptionPane.ERROR_MESSAGE);
+			IOE.printStackTrace();	
+		}	
+		
 	}
 
 
@@ -268,7 +315,7 @@ public class SportsCentreGUI extends JFrame implements ActionListener {
 	 * Process button clicks.
 	 * @param ae the ActionEvent
 	 */
-	
+
 	public void actionPerformed(ActionEvent ae) {
 
 		if (ae.getSource() == closeButton) { // The save and exit button.
@@ -276,11 +323,12 @@ public class SportsCentreGUI extends JFrame implements ActionListener {
 			System.out.println("You have hit the close button");
 			processSaveAndClose();
 			System.exit(0);
+
 		}
 
 		else if (ae.getSource() == attendanceButton) { // View Attendances button.
 
-			System.out.println("You have hit the attendance button");
+			System.out.println("You have hit the attendance button" + "\n");
 			//report = new ReportFrame ();
 			displayReport();
 		}
