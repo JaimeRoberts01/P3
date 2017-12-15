@@ -8,15 +8,16 @@ import java.util.*;
  * In addition an array can be returned in order of average attendance
  */
 
-
 public class FitnessProgram {
 
+	/* Instance variables.*/
+	
 	private final int MAXCLASSES = 7;
 	private FitnessClass[] fClass, sortedClasses;
 	private final int FIVEWEEKS = 5; 
 	
 
-	public FitnessProgram () { //Creating the array.
+	public FitnessProgram () { //Creating the FitnessClass array.
 
 		fClass = new FitnessClass [MAXCLASSES];		
 	}
@@ -26,19 +27,21 @@ public class FitnessProgram {
 		return fClass;	
 	}
 
+	
+	/* If there is no value in the array index return a String "Available". Otherwise, returns a String composed of the class names. The names are organised by start time.*/
 
-	public String buildClassList (int startTime) {
+	public String buildClassList (int startTime) { 
 
 		String className = " ";
 
 		for (int i=0; i<MAXCLASSES; i++) {
 
-			if (fClass[i] == null) {
+			if (fClass [i] == null) {
 				className = "Available";	
 			}
 
-			else if (startTime + 9  == (fClass[i].getStartTime())) {
-				className = fClass[i].getClassName();	
+			else if (startTime + 9  == (fClass [i].getStartTime ())) { // sorted by start time.
+				className = fClass [i].getClassName ();	
 				return className;
 			}
 		}	
@@ -47,6 +50,8 @@ public class FitnessProgram {
 	}
 
 
+	/* If there is no value in the array index, skip. Otherwise, returns a String composed of the tutor names. The names are organised by start time.*/
+	
 	public String buildTutorList (int startTime) {
 
 		String tutorName = " ";
@@ -57,8 +62,8 @@ public class FitnessProgram {
 				i++;
 			}
 
-			else if (startTime + 9  == (fClass[i].getStartTime())) {
-				tutorName = fClass[i].getTutorName();	
+			else if (startTime + 9  == (fClass [i].getStartTime ())) {
+				tutorName = fClass [i].getTutorName ();	
 				return tutorName;
 			}
 		}	
@@ -67,10 +72,10 @@ public class FitnessProgram {
 	}
 
 
+	/* If there is no value in the array index, skip. Otherwise, compare the class IDs and, if there's a match, return the information at that index*/
+	
 	public FitnessClass populateAttendances (String attClassID) {
 
-		
-		
 		for (int i=0; i<MAXCLASSES; i++) {
 
 			if (fClass [i] == null) {
@@ -78,22 +83,23 @@ public class FitnessProgram {
 			}
 
 			else  {
-				String getID = fClass[i].getClassID();
+				String getID = fClass [i].getClassID ();
 
-				if (getID.equals(attClassID)) {
+				if (getID.equals (attClassID)) {
 
 					System.out.println(getID + " " + attClassID);
 
 					return fClass[i];
 				}
 			}
-
 		}
 
 		return null;
 	}
 
 
+	/* Copies the sorted attendance from the fClass array into the sortedClasses array. Returns a formatted String of the array.*/
+	
 	public String sortedAttendance () {
 
 		String sortedAttendance = " ";
@@ -106,23 +112,16 @@ public class FitnessProgram {
 			}
 		}
 
-		//Arrays.sort(descendingClasses, Collections.reverseOrder());
-
-		Arrays.sort(sortedClasses);
-		sortedAttendance = (Arrays.toString(sortedClasses) + "\n");
-
-
-		String sortedAttendance1 = sortedAttendance.replace(",","");
-		String sortedAttendance2 = sortedAttendance1.replace("[","");
-		String sortedAttendanceFinal = sortedAttendance2.replaceAll("]", "");
-
+		sortedAttendance = (Arrays.toString (sortedClasses) + "\n");
+		String sortedAttendance1 = sortedAttendance.replace(",",""); // Replace the commas.
+		String sortedAttendance2 = sortedAttendance1.replace("[",""); // Replace the left-hand brackets.
+		String sortedAttendanceFinal = sortedAttendance2.replaceAll("]", ""); // Replace the right-hand brackets.
 		System.out.println("sortedClasses " + sortedAttendanceFinal);
-		//System.out.println ("sortedClasses1" + Arrays.toString(sortedClasses));
-
-		//return sortedAttendance;
 		return sortedAttendanceFinal;
 	}
 
+	
+	/* Calculates the overall average of the average attendance.*/
 	
 	public String overallAttendanceAverage () {
 
@@ -135,15 +134,14 @@ public class FitnessProgram {
 
 		for (FitnessClass fC: sortedClasses) {
 
-			individualAverage = fC.averageAttendance();
+			individualAverage = fC.getAverageAttendance();
 			sumAverages += individualAverage;
 
 			overallAverage = (double) sumAverages/sortedClasses.length;
 		}
 
-		overallAverageAttendance = String.format("%9.2f", overallAverage);	
+		overallAverageAttendance = String.format("%14.2f", overallAverage);	
 		System.out.println ("Overall Average = " + overallAverageAttendance);
-
 		return overallAverageAttendance;
 	}	
 

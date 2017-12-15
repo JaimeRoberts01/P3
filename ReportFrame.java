@@ -19,16 +19,17 @@ public class ReportFrame extends JFrame {
 	/* Setting up the frame properties.*/
 	
 	public ReportFrame (FitnessProgram fit) {
+		
 		fitP = fit;	
-		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-		setTitle("Attendance Report");
-		setSize(700, 300);
-		setResizable(false);
+		setDefaultCloseOperation (DISPOSE_ON_CLOSE);
+		setTitle ("Attendance Report");
+		setSize (700, 300);
+		setResizable (false);
 		attReport = new JTextArea();
-		attReport.setFont(new Font("Courier", Font.PLAIN, 14));
-		attReport.setEditable(false);
-		add(attReport);
-		setVisible(true);
+		attReport.setFont (new Font ("Courier", Font.PLAIN, 14));
+		attReport.setEditable (false);
+		add (attReport);
+		setVisible (true);
 	}
 
 
@@ -36,17 +37,17 @@ public class ReportFrame extends JFrame {
 	
 	public void reportFormatter () {
 
-		attReport.setBorder (new EmptyBorder (8,8,8,8));
+		attReport.setBorder (new EmptyBorder (10,10,10,10)); // Puts a border around the edge of the TextArea.
 
 		String idHeader = "ID"; String classHeader = "Class"; String tutorHeader = "Tutor"; 
 		String attendanceHeader = "Attendance"; String avgattendanceHeader = "Average Attendance";
-		String header = String.format("%-5s %-10s %-15s %-20s %-20s", idHeader, classHeader, tutorHeader, attendanceHeader, avgattendanceHeader);
-		attReport.append (header +"\n");
+		String header = String.format ("%-10s %-15s %-15s %-20s %19s", idHeader, classHeader, tutorHeader, attendanceHeader, avgattendanceHeader);
+		attReport.append (" " + header + "\n");
 		String bar = "-------------------------------------------------------------------------------------";
-		attReport.append(bar+ "\n");
-		attReport.append("\n");
-		attReport.append(fitP.sortedAttendance() + "\n");
-		attReport.append (String.format("%60s", ("Overall average: " + fitP.overallAttendanceAverage() + "\n")));
+		attReport.append (bar+ "\n\n");
+		attReport.append (" ");
+		attReport.append (fitP.sortedAttendance() + "\n");
+		attReport.append (String.format("%77s", ("Overall average: " + fitP.overallAttendanceAverage() + "\n")));
 	}
 }
 

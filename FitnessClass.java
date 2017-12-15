@@ -1,5 +1,6 @@
 import java.util.Arrays;
 
+
 /** Defines an object representing a single fitness class
  */
 
@@ -18,48 +19,48 @@ public class FitnessClass implements Comparable <FitnessClass> {
 	
 	public FitnessClass (String classes) {
 
-		String [] classDetails = classes.split(" ");
+		String [] classDetails = classes.split (" ");
 
 		classID = classDetails [0];
 		className = classDetails [1];
 		tutorName = classDetails [2];
 		startTime = Integer.parseInt (classDetails [3]);
 
-		System.out.println("In your class array: " + Arrays.toString(classDetails) +"\n");
+		System.out.println("In your class array: " + Arrays.toString (classDetails) +"\n");
 	}
 
 	
 	/* A series of getters and setters for the array details.*/
 	
-	public String getClassID() {
+	public String getClassID () {
 		return classID;
 	}
 
-	public void setClassID(String classID) {
+	public void setClassID (String classID) {
 		this.classID = classID;
 	}
 
-	public String getClassName() {
+	public String getClassName () {
 		return className;
 	}
 
-	public void setClassName(String className) {
+	public void setClassName (String className) {
 		this.className = className;
 	}
 
-	public String getTutorName() {
+	public String getTutorName () {
 		return tutorName;
 	}
 
-	public void setTutorName(String tutorName) {
+	public void setTutorName (String tutorName) {
 		this.tutorName = tutorName;
 	}
 
-	public int getStartTime() {
+	public int getStartTime () {
 		return startTime;
 	}
 
-	public void setStartTime(int startTime) {
+	public void setStartTime (int startTime) {
 		this.startTime = startTime;
 	}
 
@@ -69,10 +70,9 @@ public class FitnessClass implements Comparable <FitnessClass> {
 
 		for (int i=0; i<WEEK; i++) {
 
-			attendanceString +=  (attendanceRecords [i]+ " ");
-
+			attendanceString +=  String.format ("%5.2s", attendanceRecords [i]);
 		}
-		//String.format ("%1.2f", attendanceString);
+		
 		System.out.println("AttendanceString " + attendanceString);	
 		return attendanceString;
 	}
@@ -84,19 +84,19 @@ public class FitnessClass implements Comparable <FitnessClass> {
 
 		for (int i=0; i<WEEK; i++) {
 
-			System.out.println("AttendanceRecords " + attendanceRecords[i]);
+			System.out.println("AttendanceRecords " + attendanceRecords [i]);
 
 		}
-		System.out.println("In your attendance array: " + Arrays.toString(attendanceRecords) + "\n");
+		System.out.println("In your attendance array: " + Arrays.toString (attendanceRecords) + "\n");
 
 	}
 
 
 	/* The average attendance method adds up the values in an array and divides them by the length of the array.*/
 	
-	public double averageAttendance() { 
+	public double getAverageAttendance() { 
 
-		int attSum = 0;
+		double attSum = 0.0;
 		double attAvg = 0.0;
 
 		for (int i = 0; i< attendanceRecords.length; i++) {
@@ -104,9 +104,8 @@ public class FitnessClass implements Comparable <FitnessClass> {
 			attSum += attendanceRecords [i];	
 		}
 
-		attAvg = (double) attSum/WEEK;
+		attAvg = attSum/WEEK;
 		System.out.println("attAvg " + String.format("%.2f",attAvg));
-		String.format("%.2f", attAvg);
 		return attAvg;		
 	}
 	
@@ -120,8 +119,8 @@ public class FitnessClass implements Comparable <FitnessClass> {
 		double thisAverage = 0.0;
 		double otherAverage = 0.0;
 
-		thisAverage = this.averageAttendance();
-		otherAverage = other.averageAttendance();
+		thisAverage = this.getAverageAttendance();
+		otherAverage = other.getAverageAttendance();
 
 		if (thisAverage > otherAverage) {
 		System.out.println ("I am reading the compare Method - if");
@@ -141,13 +140,7 @@ public class FitnessClass implements Comparable <FitnessClass> {
 
 		public String toString() {
 	
-		String attendanceDisplay = String.format("%-5s %-10s %-13s %-20s %-20s\n", classID, className, tutorName, getAttendanceRecords(), String.format("%.2f", averageAttendance()) + "\n");
-		//String attendanceDisplay = String.format("%-5s %-10s %-15s %-20s %-20s\n", classID, className, tutorName, getAttendanceRecords(), averageAttendance() + "\n");
-
+		String attendanceDisplay = (String.format("%-10s %-15s %-6s %-20s %15s\n", classID, className, tutorName, getAttendanceRecords(), String.format("%.2f", getAverageAttendance()) + "\n"));
 		return attendanceDisplay;
-	
 	}
-		
-
 }
-
