@@ -2,7 +2,6 @@ import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
-
 import java.util.*;
 import java.io.*;
 
@@ -16,8 +15,9 @@ import java.io.*;
 
 public class SportsCentreGUI extends JFrame implements ActionListener {
 
+
 	/* Instance variables.*/
-	
+
 	/** GUI JButtons */
 	private JButton closeButton, attendanceButton;
 	private JButton addButton, deleteButton;
@@ -36,14 +36,16 @@ public class SportsCentreGUI extends JFrame implements ActionListener {
 	private final String classesOutFile = "ClassesOut.txt";
 	private final String attendancesFile = "AttendancesIn.txt";
 
-	private FitnessClass fitClass;
-	private FitnessProgram fitProg;
-	
-	
+	private final int MAXCLASSES = 7; // Array size.
+	private FitnessClass fitClass; // FitnessClass object.
+	private FitnessClass [] fitC; // FitnessClass array.
+	private FitnessProgram fitProg; // FitnessProgram object.
+
+
 	/**
 	 * Constructor for AssEx3GUI class
 	 */
-	
+
 	public SportsCentreGUI () {
 
 		setDefaultCloseOperation (EXIT_ON_CLOSE);
@@ -57,10 +59,10 @@ public class SportsCentreGUI extends JFrame implements ActionListener {
 		layoutTop ();
 		layoutBottom ();
 
-		/* Calls the initLadiesDay, updateDisplay and initAttendance methods.*/
-		
-		initLadiesDay ();  
-		updateDisplay (); // Calls the updateDisplay 
+
+		/* Calls the initLadiesDay and initAttendance methods.*/
+
+		initLadiesDay ();   
 		initAttendances ();
 	}
 
@@ -69,7 +71,7 @@ public class SportsCentreGUI extends JFrame implements ActionListener {
 	 * Creates the FitnessProgram list ordered by start time
 	 * using data from the file ClassesIn.txt
 	 */
-	
+
 	public void initLadiesDay () { 
 
 		fitProg = new FitnessProgram ();
@@ -82,23 +84,24 @@ public class SportsCentreGUI extends JFrame implements ActionListener {
 			scanner = new Scanner (reader);
 			while (scanner.hasNextLine ()) { 
 				String classes = scanner.nextLine ();
-				System.out.println("The initLadies day method " + classes);
 				fitClass = new FitnessClass (classes);
-				fitProg.getfClass()[fitClass.getStartTime()-9] = fitClass; // Organised by start time.
+				int getStartTime = fitClass.getStartTime();
+				fitProg.addClass (fitClass, getStartTime);
 			}
-			
-			reader.close ();
-			scanner.close ();
+
+			reader.close (); 
+			scanner.close (); 
+			updateDisplay (); // Updates the display to reflect changes in the timetable.
 		}
 
 		catch (IOException IOE) { 
-			
+
 			JOptionPane.showMessageDialog (null, "FILE NOT FOUND", "ERROR", JOptionPane.ERROR_MESSAGE);
 			IOE.printStackTrace();		
 		}
-		
+
 		catch (InputMismatchException IME) {
-			
+
 			JOptionPane.showMessageDialog (null, "INVALID FILE", "ERROR", JOptionPane.ERROR_MESSAGE);
 			IME.printStackTrace();	
 		}
@@ -109,22 +112,21 @@ public class SportsCentreGUI extends JFrame implements ActionListener {
 	 * Initialises the attendances using data
 	 * from the file AttendancesIn.txt
 	 */
-	
+
 	public void initAttendances () {
 
 		FileReader reader = null;
 		Scanner scanner = null;
 
 		try {
-			
+
 			reader = new FileReader (attendancesFile); // Reads the AttendancesIn file.
 			scanner = new Scanner (reader);
 			while (scanner.hasNextLine ()) { 
 
 				String attendances = scanner.nextLine ();
-				System.out.println ("The initAttendances method " + attendances);
 
-				String [] attendanceDetails = attendances.split (" "); // Splits the text based on spaces and assigns to an array.
+				String [] attendanceDetails = attendances.split (" "); // Splits up the text based on spaces and assigns to an array.
 				String attclassID = attendanceDetails [0];  
 
 				int week1 = Integer.parseInt (attendanceDetails [1]);
@@ -132,11 +134,11 @@ public class SportsCentreGUI extends JFrame implements ActionListener {
 				int week3 = Integer.parseInt (attendanceDetails [3]);
 				int week4 = Integer.parseInt (attendanceDetails [4]);
 				int week5 = Integer.parseInt (attendanceDetails [5]);
-				
+
 				int [] allWeeks = {week1, week2, week3, week4, week5}; // Creates an integer array for the attendance data.
 
-				fitClass = fitProg.populateAttendances(attclassID);
-				fitClass.setAttendanceRecords(allWeeks);
+				fitClass = fitProg.byClassID(attclassID); 
+				fitClass.setAttendanceRecords(allWeeks); // Sets the attendances.
 			}
 
 			reader.close ();
@@ -144,13 +146,13 @@ public class SportsCentreGUI extends JFrame implements ActionListener {
 		}
 
 		catch (IOException IOE) { 
-			
+
 			JOptionPane.showMessageDialog (null, "FILE NOT FOUND", "ERROR", JOptionPane.ERROR_MESSAGE);
 			IOE.printStackTrace();		
 		}
-		
+
 		catch (InputMismatchException IME) {
-			
+
 			JOptionPane.showMessageDialog (null, "INVALID FILE", "ERROR", JOptionPane.ERROR_MESSAGE);
 			IME.printStackTrace();	
 		}
@@ -161,27 +163,30 @@ public class SportsCentreGUI extends JFrame implements ActionListener {
 	 * Instantiates timetable display and adds it to GUI
 	 */
 
+
 	public void updateDisplay () {
 
 		display.setBorder (new EmptyBorder (10,10,10,10)); // Creates a border around the edge of the display.
 
+		display.setText ("");
+
 		String [] header = {"9-10", "10-11", "11-12", "12-13", "13-14", "14-15", "15-16"}; // Creates an array for the times.
-		
-		for (int i = 0; i<7; i++) {
-			
-			display.append(String.format("%-13s", header[i])); // Adds the times.
+
+		for (int i = 0; i < MAXCLASSES; i++) {
+
+			display.append(String.format("%-12s", header[i])); // Adds the times.
 		}
 
 		display.append("\n");
 
-		for (int i = 0; i<7; i++) {
-			display.append (String.format("%-13s", fitProg.buildClassList(i))); // Adds the class names.
+		for (int i = 0; i < MAXCLASSES; i++) {
+			display.append (String.format("%-12s", fitProg.buildClassList(i))); // Adds the class names.
 		}
 
 		display.append("\n");
 
-		for (int i = 0; i<7; i++) {
-			display.append (String.format("%-13s", fitProg.buildTutorList(i))); // Adds the tutor names.
+		for (int i = 0; i < MAXCLASSES; i++) {
+			display.append (String.format("%-12s", fitProg.buildTutorList(i))); // Adds the tutor names.
 		}	
 	}
 
@@ -205,9 +210,9 @@ public class SportsCentreGUI extends JFrame implements ActionListener {
 	/**
 	 * adds labels, text fields and buttons to bottom of GUI
 	 */
-	
+
 	public void layoutBottom() {
-		
+
 		// instantiate panel for bottom of display
 		JPanel bottom = new JPanel (new GridLayout (3, 3));
 		bottom.setBorder (new EmptyBorder (10,10,10,10));
@@ -247,67 +252,132 @@ public class SportsCentreGUI extends JFrame implements ActionListener {
 	 * Processes adding a class
 	 */
 
+	/* Deals with input data. If the TextFields are empty, the array is full or the class (class ID) is already in the array,
+	 * JOptionPane boxes are initiated. Otherwise, the data is processed by method in the FitnessProgram class, the display is 
+	 * updated and the TextFields are reset.*/
+
 	public void processAdding () {
-		
-		System.err.println("processAdding method");
-		// your code here
+
+		String classIDIn = idIn.getText ();
+		String classNameIn = classIn.getText ();
+		String tutorNameIn = tutorIn.getText ();
+
+
+		if (classIDIn.isEmpty () || classNameIn.isEmpty () || tutorNameIn.isEmpty ()) {
+
+			JOptionPane.showMessageDialog (null, "PLEASE CHECK INPUT DETAILS", "ERROR", JOptionPane.ERROR_MESSAGE);
+		}
+
+		else if (fitProg.getNumClasses () == MAXCLASSES) {
+
+			JOptionPane.showMessageDialog (null, "CLASS TIMETABLE IS FULL", "ERROR", JOptionPane.ERROR_MESSAGE);
+		}
+
+		else if (fitProg.byClassID (classIDIn) != null) {
+
+			JOptionPane.showMessageDialog (null, "THERE IS ALREADY A CLASS WITH THIS ID", "ERROR", JOptionPane.ERROR_MESSAGE);	
+		}
+
+		else {
+
+			fitProg.classAddition (classIDIn, classNameIn, tutorNameIn);
+			updateDisplay ();
+			idIn.setText ("");
+			classIn.setText ("");
+			tutorIn.setText ("");
+		}
 	}
 
 
 	/**
 	 * Processes deleting a class
 	 */
-	
+
+	/* Deals with input data. If the ID TextField is empty, the array is empty or the class (class ID) is not in the array,
+	 * JOptionPane boxes are initiated. Otherwise, the data is processed by method in the FitnessProgram class, the display 
+	 * is updated and the TextFields are reset.*/
+
 	public void processDeletion () {
-		
-		System.err.println("processDeletion method");
-		// your code here
+
+		String classIDIn = idIn.getText ();
+
+		if (classIDIn.isEmpty ()) {
+
+			JOptionPane.showMessageDialog (null, "PLEASE CHECK INPUT DETAILS", "ERROR", JOptionPane.ERROR_MESSAGE);
+		}
+
+		else if (fitProg.getNumClasses () == 0) {
+
+			JOptionPane.showMessageDialog (null, "THERE ARE NO CLASSES IN THE TIMETABLE", "ERROR", JOptionPane.ERROR_MESSAGE);
+		}
+
+		else if (fitProg.byClassID (classIDIn) == null) {
+
+			JOptionPane.showMessageDialog (null, "THERE ARE NO CLASSES REGISTERED WITH THIS ID", "ERROR", JOptionPane.ERROR_MESSAGE);
+		}
+
+		else {
+
+			fitProg.classDeletion(classIDIn);
+			updateDisplay (); 
+			idIn.setText ("");
+		}
 	}
 
-	
+
 	/**
 	 * Instantiates a new window and displays the attendance report
 	 */
 
 	public void displayReport () {
 
-		System.err.println ("displayReport method");
 		report = new ReportFrame (fitProg);
 		report.reportFormatter ();
 	}
 
-	
+
 	/**
 	 * Writes lines to file representing class name, 
 	 * tutor and start time and then exits from the program
 	 */
-	
+
 	public void processSaveAndClose () {
 
 		FileWriter fWriter = null;
 
 		try{
-			
+
 			try {
+
 				fWriter = new FileWriter (classesOutFile);
-//				fWriter.write("This file writer is working"); // this bit needs to be in a loop, i think.
-				while (fWriter.hasNextLine ()) { 
-				fWriter.write(fitClass.toString()); // this bit needs to be in a loop, i think.
-				System.err.println("The file writer is working");
+				fitC = fitProg.getfClass();
+				@SuppressWarnings("unused")
+				int i = 0;
+
+				for (FitnessClass fit : fitC ) {
+
+					if (fit == null) {
+						i++;
+					}
+
+					else {
+
+						fWriter.write(fit.classesOutFile() + "\n");
+					}
+				}
 			}
 
 			finally {
+
 				if (fWriter != null) fWriter.close (); // Closes the writer.
-				
 			}
 		}
 
 		catch (IOException IOE) {
-			
+
 			JOptionPane.showMessageDialog (null, "FILE NOT FOUND", "ERROR", JOptionPane.ERROR_MESSAGE);
 			IOE.printStackTrace ();	
 		}	
-		
 	}
 
 
@@ -319,21 +389,23 @@ public class SportsCentreGUI extends JFrame implements ActionListener {
 	public void actionPerformed(ActionEvent ae) {
 
 		if (ae.getSource() == closeButton) { // Save and exit button.
-			
-			processSaveAndClose();
+
+			processSaveAndClose(); 
 			System.exit(0); // Closes the program.
 		}
 
 		else if (ae.getSource () == attendanceButton) { // View Attendances button.
-			
+
 			displayReport();
 		}
 
-		else if (ae.getSource () == addButton) {
+		else if (ae.getSource () == addButton) { // Add class button.
+
 			processAdding();
 		}
 
-		else if (ae.getSource () == deleteButton) { 
+		else if (ae.getSource () == deleteButton) { // Delete class button.
+
 			processDeletion();
 		}
 	}

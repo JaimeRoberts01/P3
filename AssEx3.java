@@ -2,7 +2,6 @@
  * The main class
  */
 
-
 public class AssEx3 {
 	
 	

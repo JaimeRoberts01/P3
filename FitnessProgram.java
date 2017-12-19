@@ -8,27 +8,68 @@ import java.util.*;
  * In addition an array can be returned in order of average attendance
  */
 
+
 public class FitnessProgram {
 
 	/* Instance variables.*/
-	
+
 	private final int MAXCLASSES = 7;
 	private FitnessClass[] fClass, sortedClasses;
-	private final int FIVEWEEKS = 5; 
-	
+	private int numClasses;
 
-	public FitnessProgram () { //Creating the FitnessClass array.
 
-		fClass = new FitnessClass [MAXCLASSES];		
+	public FitnessProgram () { 
+
+		fClass = new FitnessClass [MAXCLASSES];	// Creates the FitnessClass array.	
 	}
 
 
-	public FitnessClass [] getfClass () {
+	public int getNumClasses () { // Returns the number of non-null classes in the array.
+		return numClasses;
+	}
+
+
+	/* Organises the FitnessClass array based on the start time of the classes. It increases the class count with each one.*/
+
+	public void addClass (FitnessClass fitClass, int getStartTime) {
+
+		int startTime = getStartTime - 9;
+
+		if (numClasses == MAXCLASSES) {
+		}
+
+		else { 
+
+			fClass [startTime] = fitClass;
+			numClasses ++;
+		}
+	}
+
+
+	public FitnessClass [] getfClass () { // Returns the array.
+
 		return fClass;	
 	}
 
-	
-	/* If there is no value in the array index return a String "Available". Otherwise, returns a String composed of the class names. The names are organised by start time.*/
+
+	/*Locates the first available time-slot.*/
+
+	public int getAvailableTimeSlots () {
+
+		for (int i = 0; i < MAXCLASSES; i++)	{
+
+			if (fClass [i] == null) {
+
+				return i+9;
+			}
+		}
+
+		return 0;
+	}
+
+
+	/* If there is no value in the array index return a String "Available". Otherwise, returns a String composed of the class names. The 
+	 * names are organised by start time.*/
 
 	public String buildClassList (int startTime) { 
 
@@ -45,13 +86,14 @@ public class FitnessProgram {
 				return className;
 			}
 		}	
-	
+
 		return className;
 	}
 
 
-	/* If there is no value in the array index, skip. Otherwise, returns a String composed of the tutor names. The names are organised by start time.*/
-	
+	/* If there is no value in the array index, skip. Otherwise, returns a String composed of the tutor names. The names are organised by 
+	 * start time.*/
+
 	public String buildTutorList (int startTime) {
 
 		String tutorName = " ";
@@ -67,14 +109,15 @@ public class FitnessProgram {
 				return tutorName;
 			}
 		}	
-	
+
 		return tutorName;
 	}
 
 
-	/* If there is no value in the array index, skip. Otherwise, compare the class IDs and, if there's a match, return the information at that index*/
-	
-	public FitnessClass populateAttendances (String attClassID) {
+	/* If there is no value in the array index, skip. Otherwise, compare the class IDs and, if there's a match, return the information at 
+	 * that index.*/
+
+	public FitnessClass byClassID (String attClassID) {
 
 		for (int i=0; i<MAXCLASSES; i++) {
 
@@ -83,11 +126,10 @@ public class FitnessProgram {
 			}
 
 			else  {
+
 				String getID = fClass [i].getClassID ();
 
 				if (getID.equals (attClassID)) {
-
-					System.out.println(getID + " " + attClassID);
 
 					return fClass[i];
 				}
@@ -98,31 +140,91 @@ public class FitnessProgram {
 	}
 
 
+	/*If null, sets the details for class ID, class name, tutor name and the start time of the first available time-slot. Increases the
+	 * number of classes in the array and sets the attendances.*/
+
+	public void classAddition (String classIDIn, String classNameIn, String tutorNameIn) {
+
+		int startTime = this.getAvailableTimeSlots();
+
+		for (int i = 0; i< MAXCLASSES; i++) {
+
+			if (fClass [i] == null) {
+
+				fClass [i] = new FitnessClass ();
+
+				fClass [i].setClassID(classIDIn);
+				fClass [i].setClassName(classNameIn);
+				fClass [i].setTutorName(tutorNameIn);
+				fClass [i].setStartTime(startTime);
+
+				numClasses ++;
+
+				int [] addedAttendance = {0,0,0,0,0};
+				fClass [i].setAttendanceRecords(addedAttendance);
+
+				break;
+			}
+		}
+	}
+
+
+	/*If not null and the class ID in the TextField matches one in the timetable, remove that class and decrease the class count.*/
+
+	public void classDeletion (String classIDIn) {
+
+		for (int i = 0; i< MAXCLASSES; i++) {
+
+			if ((fClass [i] != null) && (fClass [i].getClassID().equals(classIDIn))) {
+
+				fClass [i] = null;
+				numClasses --;
+			}
+		}
+	}
+
+
 	/* Copies the sorted attendance from the fClass array into the sortedClasses array. Returns a formatted String of the array.*/
-	
+
 	public String sortedAttendance () {
 
 		String sortedAttendance = " ";
-		sortedClasses = new FitnessClass [FIVEWEEKS];
-		int j = 0;
+		int size = 0;
 
-		for (int i = 0; i < MAXCLASSES; i++) {
-			if (fClass[i] != null) {
-				sortedClasses[j++] = fClass [i];
+		for (int i = 0; i < fClass.length; i++) { 
+
+			if (fClass [i] != null) { 
+				size++;
 			}
 		}
 
+		sortedClasses = new FitnessClass [size];
+		
+		int j = 0;
+
+		for (int i = 0; i < MAXCLASSES; i++) {
+			
+			if (fClass [i] != null) {
+				
+				sortedClasses [j++] = fClass [i];
+			}
+		}
+
+		Arrays.sort (sortedClasses);
+
+		/* Replaces all the commas and brackets of the array.*/
+
 		sortedAttendance = (Arrays.toString (sortedClasses) + "\n");
-		String sortedAttendance1 = sortedAttendance.replace(",",""); // Replace the commas.
-		String sortedAttendance2 = sortedAttendance1.replace("[",""); // Replace the left-hand brackets.
-		String sortedAttendanceFinal = sortedAttendance2.replaceAll("]", ""); // Replace the right-hand brackets.
-		System.out.println("sortedClasses " + sortedAttendanceFinal);
+		String sortedAttendance1 = sortedAttendance.replace (",",""); 
+		String sortedAttendance2 = sortedAttendance1.replace ("[",""); 
+		String sortedAttendanceFinal = sortedAttendance2.replaceAll ("]", ""); 
+
 		return sortedAttendanceFinal;
 	}
 
-	
+
 	/* Calculates the overall average of the average attendance.*/
-	
+
 	public String overallAttendanceAverage () {
 
 
@@ -140,45 +242,7 @@ public class FitnessProgram {
 			overallAverage = (double) sumAverages/sortedClasses.length;
 		}
 
-		overallAverageAttendance = String.format("%14.2f", overallAverage);	
-		System.out.println ("Overall Average = " + overallAverageAttendance);
+		overallAverageAttendance = String.format("%15.2f", overallAverage);	
 		return overallAverageAttendance;
 	}	
-
-
-
-
-
-
-
-
-
-
-	//	public int getNumClasses() {
-	//		return numClasses;
-	//	}
-	//
-	//	public void setNumClasses(int numClasses) {
-	//		this.numClasses = numClasses;
-	//	}
-	//
-	//	public void checkArray () {
-	//
-	//		for (int i =0; i< MAXCLASSES; i++) {
-	//			if (fClass[i] == null) {
-	//				System.err.println ("null");
-	//			}
-	//			else {
-	//				System.err.println(fClass[i].getStartTime());
-	//				//System.err.println(fClass [i]);
-	//			}
-	//			//System.err.println(fClass.getClass());
-	//			//
-	//		}
-	//
-	//	}
 }
-
-
-
-

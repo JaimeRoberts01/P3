@@ -15,11 +15,11 @@ public class ReportFrame extends JFrame {
 	private JTextArea attReport;
 	private FitnessProgram fitP;
 
-	
+
 	/* Setting up the frame properties.*/
-	
+
 	public ReportFrame (FitnessProgram fit) {
-		
+
 		fitP = fit;	
 		setDefaultCloseOperation (DISPOSE_ON_CLOSE);
 		setTitle ("Attendance Report");
@@ -34,7 +34,7 @@ public class ReportFrame extends JFrame {
 
 
 	/* Sets up the contents of the frame including header, separating bar and display content.*/
-	
+
 	public void reportFormatter () {
 
 		attReport.setBorder (new EmptyBorder (10,10,10,10)); // Puts a border around the edge of the TextArea.
@@ -46,11 +46,7 @@ public class ReportFrame extends JFrame {
 		String bar = "-------------------------------------------------------------------------------------";
 		attReport.append (bar+ "\n\n");
 		attReport.append (" ");
-		attReport.append (fitP.sortedAttendance() + "\n");
-		attReport.append (String.format("%77s", ("Overall average: " + fitP.overallAttendanceAverage() + "\n")));
+		attReport.append (fitP.sortedAttendance());
+		attReport.append (String.format("%77s", ("Overall average: " + fitP.overallAttendanceAverage())));
 	}
 }
-
-
-
-
